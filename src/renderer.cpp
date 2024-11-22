@@ -132,6 +132,9 @@ void Renderer::drawQuad(const glm::vec3& position,
                         const glm::vec3& scale,
                         const glm::vec3& color)
 {
+    if (s_data.modelIndex >= 1000)
+        flush();
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
     model = glm::scale(model, scale);
@@ -170,6 +173,68 @@ void Renderer::drawQuad(const glm::vec3& position,
     s_data.vertexOffset += 4;
     s_data.indexOffset  += 6;
     s_data.modelIndex   += 1.0f;
+}
+
+void Renderer::drawMaze(const Maze &maze)
+{
+    const auto& grid = maze.getGrid();
+    auto rows = grid.size();    // Number of rows in the maze grid
+    auto cells = grid[0].size(); // Number of columns in the maze grid
+
+    // Calculate quad size based on maze grid dimensions
+    float quadWidth = 2.0f / (cells * 2 + 1);  // Width per cell (including walls)
+    float quadHeight = 2.0f / (rows * 2 + 1);  // Height per cell (including walls)
+
+    for (int y = 0; y < rows * 2 + 1; ++y)
+    {
+        for (int x = 0; x < cells * 2 + 1; ++x)
+        {
+            // Calculate position in NDC
+            float xPos = -1.0f + x * quadWidth;
+            float yPos = 1.0f - y * quadHeight; // Flipping y-axis for OpenGL's NDC
+
+            glm::vec3 color = glm::vec3(1.0f); // Default white color (for debugging)
+
+            if (y % 2 == 0 || x % 2 == 0) // Check if it's a wall location
+            {
+                if (y % 2 == 0 && x % 2 == 0) // Corner walls
+                {
+                    color = glm::vec3(0.3f, 0.5f, 0.7f); // Wall color
+                }
+                else if (y % 2 == 0) // Horizontal walls
+                {
+                    int cx = x / 2;
+                    int cy = (y - 1) / 2;
+                    if (cy >= 0 && cy < rows && cx >= 0 && cx < cells && (grid[cy][cx] & S))
+                        color = glm::vec3(0.0f); // Path
+                    else
+                        color = glm::vec3(0.3f, 0.5f, 0.7f); // Wall
+                }
+                else if (x % 2 == 0) // Vertical walls
+                {
+                    int cx = (x - 1) / 2;
+                    int cy = y / 2;
+                    if (cy >= 0 && cy < rows && cx >= 0 && cx < cells && (grid[cy][cx] & E))
+                        color = glm::vec3(0.0f); // Path
+                    else
+                        color = glm::vec3(0.3f, 0.5f, 0.7f); // Wall
+                }
+                else
+                {
+                    color = glm::vec3(0.3f, 0.5f, 0.7f); // Default edge wall color
+                }
+            }
+            else // Path cells
+            {
+                color = glm::vec3(0.0f); // Path color
+            }
+
+            // Draw the quad at the calculated position
+            drawQuad(glm::vec3(xPos, yPos, 0.0f),  // Quad center
+                     glm::vec3(quadWidth, quadHeight, 1.0f), // Quad size
+                     color); // Quad color
+        }
+    }
 }
 
 void Renderer::flush()

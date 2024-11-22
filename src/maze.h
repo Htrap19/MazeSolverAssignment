@@ -4,6 +4,12 @@
 #include <stdint.h>
 #include <vector>
 #include <random>
+#include <map>
+
+static const int N = 1, S = 2, E = 4, W = 8;
+static const std::map<int, int> DX = { {E, 1}, {W, -1}, {N, 0}, {S, 0} };
+static const std::map<int, int> DY = { {E, 0}, {W, 0}, {N, -1}, {S, 1} };
+static const std::map<int, int> OPPOSITE = { {E, W}, {W, E}, {N, S}, {S, N} };
 
 class Maze
 {
@@ -14,7 +20,7 @@ public:
     void generate(uint32_t seed = 0);
     void clear();
     bool isValidCell(int cx, int cy);
-    bool isWall(int cx, int cy);
+    bool isWall(int cx, int cy) const;
 
     const std::vector<std::vector<int>>& getGrid() const;
 

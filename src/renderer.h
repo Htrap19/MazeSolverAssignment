@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "shader.h"
+#include "maze.h"
 
 #include <glm/glm.hpp>
 
@@ -28,6 +29,8 @@ public:
     void drawQuad(const glm::vec3& position,
                   const glm::vec3& scale,
                   const glm::vec3& color = glm::vec3(1.0f));
+
+    void drawMaze(const Maze& maze);
 
     void flush();
 
