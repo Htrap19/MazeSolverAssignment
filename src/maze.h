@@ -14,7 +14,7 @@ public:
     void generate(uint32_t seed = 0);
     void clear();
     bool isValidCell(int cx, int cy);
-    bool isWall(int cx, int cy);
+    bool isWall(int cx, int cy) const;
 
     const std::vector<std::vector<int>>& getGrid() const;
 

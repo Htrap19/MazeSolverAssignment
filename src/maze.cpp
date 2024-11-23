@@ -30,7 +30,7 @@ bool Maze::isValidCell(int cx, int cy)
     return cx >= 0 && cy >= 0 && cx < m_width && cy < m_height;
 }
 
-bool Maze::isWall(int cx, int cy)
+bool Maze::isWall(int cx, int cy) const
 {
     return m_grid[cy][cx] == 1;
 }
