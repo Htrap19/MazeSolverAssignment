@@ -190,19 +190,43 @@ void Renderer::drawMaze(const Maze &maze)
         for (int x = 0; x < cells; ++x)
         {
             // Calculate position in normalized device coordinates
-            float xPos = -1.0f + x * quadWidth + quadWidth / 2.0f;
+            float xPos = 1.0f - x * quadWidth + quadWidth / 2.0f;
             float yPos = -1.0f + y * quadHeight + quadHeight / 2.0f;
 
-            glm::vec3 color = !maze.isWall(x, y) ?
-                                  glm::vec3(0.0f) :
-                                  glm::vec3(0.3f, 0.5f, 0.7f);
+            glm::vec3 color = maze.isWall(x, y) ?
+                                  glm::vec3(0.3f, 0.5f, 0.7f) :
+                                  glm::vec3(0.0f);
+
 
             drawQuad(glm::vec3(xPos, yPos, 0.0f),
                      glm::vec3(quadWidth, quadHeight, 1.0f),
                      color);
         }
     }
+}
 
+void Renderer::drawPath(const std::vector<Point> &path,
+                        const PathFinder& finder)
+{
+    const auto& grid = finder.getMaze().getGrid();
+    auto rows = grid.size();
+    auto cells = grid[0].size();
+
+    // Calculate quad size based on window dimensions
+    float quadWidth = 2.0f / rows;
+    float quadHeight = 2.0f / cells;
+
+    // Mark path
+    for (const auto& p : path)
+    {
+        // Calculate position in normalized device coordinates
+        float xPos = 1.0f - p.x * quadWidth + quadWidth / 2.0f;
+        float yPos = -1.0f + p.y * quadHeight + quadHeight / 2.0f;
+
+        drawQuad(glm::vec3(xPos, yPos, 0.0f),
+                 glm::vec3(quadWidth * 0.2f, quadHeight * 0.2f, 1.0f),
+                 glm::vec3(0.5f, 0.7f, 0.3f));
+    }
 }
 
 void Renderer::flush()

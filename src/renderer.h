@@ -3,6 +3,7 @@
 
 #include "shader.h"
 #include "maze.h"
+#include "pathfinder.h"
 
 #include <glm/glm.hpp>
 
@@ -31,6 +32,8 @@ public:
                   const glm::vec3& color = glm::vec3(1.0f));
 
     void drawMaze(const Maze& maze);
+    void drawPath(const std::vector<Point>& path,
+                  const PathFinder& finder);
 
     void flush();
 

@@ -8,7 +8,7 @@ Maze::Maze(uint32_t width, uint32_t height)
     m_width = width % 2 == 0 ? width + 1 : width;
     m_height = height % 2 == 0 ? height + 1 : height;
 
-    m_grid = std::vector(m_width, std::vector(m_height, 1));
+    m_grid = std::vector(m_height, std::vector(m_width, 1));
 }
 
 void Maze::generate(uint32_t seed)
@@ -25,7 +25,7 @@ void Maze::clear()
     m_grid = std::vector(m_height, std::vector(m_width, 1));
 }
 
-bool Maze::isValidCell(int cx, int cy)
+bool Maze::isValidCell(int cx, int cy) const
 {
     return cx >= 0 && cy >= 0 && cx < m_width && cy < m_height;
 }
@@ -37,9 +37,6 @@ bool Maze::isWall(int cx, int cy) const
 
 void Maze::recursiveBacktracking(int cx, int cy)
 {
-    static const int dx[] = { 0, 1,  0, -1 };
-    static const int dy[] = { 1, 0, -1,  0 };
-
     std::array<int, 4> directions = { 0, 1, 2, 3 };
     std::shuffle(directions.begin(),
                  directions.end(),
@@ -61,6 +58,16 @@ void Maze::recursiveBacktracking(int cx, int cy)
     }
 }
 
+uint32_t Maze::getWidth() const
+{
+    return m_width;
+}
+
+uint32_t Maze::getHeight() const
+{
+    return m_height;
+}
+
 const
 std::vector<std::vector<int>>& Maze::getGrid() const
 {
@@ -69,8 +76,10 @@ std::vector<std::vector<int>>& Maze::getGrid() const
 
 void Maze::print() const
 {
-    for (const auto& row : m_grid) {
-        for (int cell : row) {
+    for (const auto& row : m_grid)
+    {
+        for (int cell : row)
+        {
             std::cout << (cell ? "█" : " ");
         }
         std::cout << std::endl;
