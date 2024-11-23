@@ -10,7 +10,7 @@ int main()
 
     renderer.init();
 
-    Maze m(31, 31);
+    Maze m(10, 10);
     m.generate(time(nullptr));
     m.print();
 
@@ -19,6 +19,9 @@ int main()
     while (!renderer.shouldClose())
     {
         renderer.pollEvents();
+
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         // if (generateNew > 100)
         // {

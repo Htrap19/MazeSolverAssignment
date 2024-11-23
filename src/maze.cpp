@@ -5,8 +5,10 @@
 
 Maze::Maze(uint32_t width, uint32_t height)
 {
-    m_width = width % 2 == 0 ? width + 1 : width;
-    m_height = height % 2 == 0 ? height + 1 : height;
+    m_width = width;
+    m_height = height;
+    // m_width = width % 2 == 0 ? width + 1 : width;
+    // m_height = height % 2 == 0 ? height + 1 : height;
 
     m_grid = std::vector(m_width, std::vector(m_height, 0));
 }
@@ -42,14 +44,15 @@ void Maze::recursiveBacktracking(int cx, int cy)
                  directions.end(),
                  m_rng);
 
-    for (int direction : directions) {
+    for (int direction : directions)
+    {
         int nx = cx + DX.at(direction);
         int ny = cy + DY.at(direction);
 
         // Check bounds and whether the cell has been visited
-        if (ny >= 0 && ny < m_grid.size() &&
-            nx >= 0 && nx < m_grid[ny].size()
-            && m_grid[ny][nx] == 0) {
+        if (isValidCell(nx, ny) &&
+            m_grid[ny][nx] == 0)
+        {
             m_grid[cy][cx] |= direction;
             m_grid[ny][nx] |= OPPOSITE.at(direction);
             recursiveBacktracking(nx, ny);
@@ -77,7 +80,7 @@ void Maze::recursiveBacktracking(int cx, int cy)
 
     //     if (isValidCell(nx, ny) && m_grid[ny][nx] == 1)
     //     {
-    //         m_grid[cy][cx] |= dir;
+    //         m_grid[cy][cx] |= 0;
     //         m_grid[ny][nx] |= opposite[dir];
 
     //         recursiveBacktracking(nx, ny);
