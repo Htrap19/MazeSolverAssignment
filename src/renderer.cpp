@@ -190,7 +190,7 @@ void Renderer::drawMaze(const Maze &maze)
         for (int x = 0; x < cells; ++x)
         {
             // Calculate position in normalized device coordinates
-            float xPos = 1.0f - x * quadWidth + quadWidth / 2.0f;
+            float xPos = -1.0f + x * quadWidth + quadWidth / 2.0f;
             float yPos = -1.0f + y * quadHeight + quadHeight / 2.0f;
 
             glm::vec3 color = maze.isWall(x, y) ?
@@ -220,7 +220,7 @@ void Renderer::drawPath(const std::vector<Point> &path,
     for (const auto& p : path)
     {
         // Calculate position in normalized device coordinates
-        float xPos = 1.0f - p.x * quadWidth + quadWidth / 2.0f;
+        float xPos = -1.0f + p.x * quadWidth + quadWidth / 2.0f;
         float yPos = -1.0f + p.y * quadHeight + quadHeight / 2.0f;
 
         drawQuad(glm::vec3(xPos, yPos, 0.0f),

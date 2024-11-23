@@ -11,10 +11,10 @@ int main()
 
     renderer.init();
 
-    Maze m(21, 21);
+    Maze m(51, 51);
     m.generate(time(nullptr));
 
-    Point start{0, 0}, end{20, 20};
+    Point start{0, 0}, end{50, 50};
 
     PathFinder finder(m);
     auto path = finder.findPath(start, end);
