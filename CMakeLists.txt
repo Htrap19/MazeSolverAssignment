@@ -29,6 +29,8 @@ add_executable(maze_solver_visualization
 
     src/maze.h src/maze.cpp
     src/pathfinder.h src/pathfinder.cpp
+    src/application.h src/application.cpp
+    src/mazevisualizerapp.h src/mazevisualizerapp.cpp
 )
 
 target_link_libraries(maze_solver_visualization

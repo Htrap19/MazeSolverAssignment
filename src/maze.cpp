@@ -35,6 +35,12 @@ bool Maze::isWall(int cx, int cy) const
     return m_grid[cy][cx] == 1;
 }
 
+void Maze::setSize(uint32_t width, uint32_t height)
+{
+    m_width = width;
+    m_height = height;
+}
+
 void Maze::recursiveBacktracking(int cx, int cy)
 {
     std::array<int, 4> directions = { 0, 1, 2, 3 };

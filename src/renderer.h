@@ -23,9 +23,6 @@ public:
     ~Renderer();
 
     void init();
-    bool shouldClose();
-    void pollEvents();
-    void swapBuffers();
 
     void drawQuad(const glm::vec3& position,
                   const glm::vec3& scale,
@@ -40,27 +37,14 @@ public:
     const
     Shader& mainShader() const;
 
-    void rendererDockspace();
-
-    void showDockspace();
-
-    void bindFramebuffer();
-    void unbindFramebuffer();
-
 private:
     void onResize(uint32_t width,
                   uint32_t height);
 
 private:
-    GLFWwindow* m_window = nullptr;
-    uint32_t m_width = 720;
-    uint32_t m_height = 480;
-
     Shader m_mainShader;
     uint32_t m_vao, m_vbo, m_ibo;
-    uint32_t m_fbo, m_fboTexture, m_rbo;
-
-    friend void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+    uint32_t m_width, m_height;
 };
 
 #endif // RENDERER_H

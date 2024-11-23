@@ -21,6 +21,9 @@ public:
     bool isValidCell(int cx, int cy) const;
     bool isWall(int cx, int cy) const;
 
+    void setSize(uint32_t width,
+                 uint32_t height);
+
     const std::vector<std::vector<int>>& getGrid() const;
 
     void print() const;
