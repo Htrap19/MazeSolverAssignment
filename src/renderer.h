@@ -40,6 +40,13 @@ public:
     const
     Shader& mainShader() const;
 
+    void rendererDockspace();
+
+    void showDockspace();
+
+    void bindFramebuffer();
+    void unbindFramebuffer();
+
 private:
     void onResize(uint32_t width,
                   uint32_t height);
@@ -51,6 +58,7 @@ private:
 
     Shader m_mainShader;
     uint32_t m_vao, m_vbo, m_ibo;
+    uint32_t m_fbo, m_fboTexture, m_rbo;
 
     friend void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 };

@@ -1,9 +1,10 @@
-#include <iostream>
-#include <glad/glad.h>
-
 #include "renderer.h"
 #include "maze.h"
 #include "pathfinder.h"
+
+#include <glad/glad.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 int main()
 {
@@ -24,6 +25,8 @@ int main()
     {
         renderer.pollEvents();
 
+        renderer.bindFramebuffer();
+
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -34,6 +37,10 @@ int main()
         // renderer.drawQuad(glm::vec3(0.3f, 0.3f, 0.0f), glm::vec3(0.3f, 0.5f, 0.8f)); // blue quad
 
         renderer.flush();
+
+        renderer.unbindFramebuffer();
+
+        renderer.rendererDockspace(); // Start Imgui frame
 
         renderer.swapBuffers();
     }
