@@ -7,6 +7,8 @@
 
 #include <glm/glm.hpp>
 
+#include <unordered_set>
+
 struct GLFWwindow;
 class Renderer
 {
@@ -31,6 +33,10 @@ public:
     void drawMaze(const Maze& maze);
     void drawPath(const std::vector<Point>& path,
                   const PathFinder& finder);
+
+    void visPath(const Maze& maze,
+                 const std::vector<Point>& point,
+                 const std::unordered_set<Point, PointHash>& openSet);
 
     void flush();
 

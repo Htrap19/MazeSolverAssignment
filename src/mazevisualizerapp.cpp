@@ -20,13 +20,14 @@ void MazeVisualizerApp::onCreate()
 
     m_start = {0, 0};
     m_end = {50, 50};
-    m_path = m_finder.findPath(m_start, m_end);
+    // m_path = m_finder.findPath(m_start, m_end);
 }
 
 void MazeVisualizerApp::onUpdate()
 {
     m_renderer.drawMaze(m_maze);
-    m_renderer.drawPath(m_path, m_finder);
+    if (m_showFinalPath)
+        m_renderer.drawPath(m_path, m_finder);
 
     const auto& grid = m_maze.getGrid();
     auto rows = grid.size();
@@ -42,15 +43,50 @@ void MazeVisualizerApp::onUpdate()
         auto color = i == 0 ? m_startPointColor : m_endPointColor;
         float xPos = -1.0f + point.x * quadWidth + quadWidth / 2.0f;
         float yPos = -1.0f + point.y * quadHeight + quadHeight / 2.0f;
-        m_renderer.drawQuad({xPos, xPos, 0.0},
+        m_renderer.drawQuad({xPos, yPos, 0.0},
                             {quadWidth * 0.6f, quadHeight * 0.6f, 0.0f},
                             color);
+    }
+
+    if (!m_iteration.empty() && m_iterate)
+    {
+        auto& iterData = m_iteration[m_iterIndex];
+        auto point = iterData.currentPoint;
+
+        float xCurrPos = -1.0f + point.x * quadWidth + quadWidth / 2.0f;
+        float yCurrPos = -1.0f + point.y * quadHeight + quadHeight / 2.0f;
+        m_renderer.drawQuad({xCurrPos, yCurrPos, 0.0},
+                            {quadWidth, quadHeight, 0.0f},
+                            glm::vec3(0.5f, 0.2f, 0.3f));
+
+        m_renderer.drawPath(iterData.path, m_finder);
+
+        for (auto& [n, fScore] : iterData.neighbors)
+        {
+            float xPos = -1.0f + n.x * quadWidth + quadWidth / 2.0f;
+            float yPos = -1.0f + n.y * quadHeight + quadHeight / 2.0f;
+            m_renderer.drawQuad({xPos, yPos, 0.0},
+                                {quadWidth, quadHeight, 0.0f},
+                                glm::vec3(0.2f, 0.5f, 0.3f));
+        }
     }
 
     // renderer.drawQuad(glm::vec3(0.2f, 0.2f, 0.0f), glm::vec3(0.5f, 0.8f, 0.3f)); // greeb quad
     // renderer.drawQuad(glm::vec3(0.3f, 0.3f, 0.0f), glm::vec3(0.3f, 0.5f, 0.8f)); // blue quad
 
     m_renderer.flush();
+
+    if (m_isPlaying && m_iterate)
+    {
+        static uint32_t playTimeout = 0;
+        playTimeout++;
+
+        if (playTimeout >= 2)
+        {
+            onNext();
+            playTimeout = 0;
+        }
+    }
 }
 
 void MazeVisualizerApp::onImGuiUpdate()
@@ -120,6 +156,16 @@ void MazeVisualizerApp::onImGuiUpdate()
     ImGui::End();
 
     ImGui::Begin("Path Finder");
+    static const char* pathFinderAlgos[] =
+        {   "Breadth-First Search (BFS)",
+            "Depth-First Search (DFS)",
+            "A*"
+        };
+    static int currentPathFinderAlgo = 2;
+    if (ImGui::Combo("Algo", &currentPathFinderAlgo, pathFinderAlgos, IM_ARRAYSIZE(pathFinderAlgos)))
+    {
+        std::cout << "Selected: " << pathFinderAlgos[currentPathFinderAlgo] << std::endl;
+    }
     ImGui::InputInt2("Start Pos", &m_start.x);
     ImGui::SameLine();
     ImGui::ColorEdit4("Start Point Color",
@@ -135,8 +181,51 @@ void MazeVisualizerApp::onImGuiUpdate()
     if (ImGui::Button("Find"))
         onFind();
     ImGui::SameLine();
-    if (ImGui::Button("Clear"))
-        onClear();
+    ImGui::Checkbox("Show final path", &m_showFinalPath);
+
+    ImGui::SeparatorText("Iteration");
+    ImGui::Checkbox("Iterate", &m_iterate);
+    if (ImGui::Button("< Prev"))
+        onPrev();
+    ImGui::SameLine();
+    if (ImGui::Button(m_isPlaying ? "Pause" : "Play"))
+    {
+        if (m_isPlaying)
+            onPause();
+        else
+            onPlay();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Next >"))
+        onNext();
+
+    // Calculate the position of from grid based on the mouse pos
+    // if (m_isViewportFocused)
+    // {
+    //     ImVec2 windowSize = ImGui::GetWindowSize();  // Get the window size
+    //     ImVec2 textSize = ImGui::CalcTextSize("1000x1000");  // Get the text size
+
+    //     // Set the cursor position to the bottom-right corner
+    //     ImGui::SetCursorPos(ImVec2(10, windowSize.y - textSize.y - 10));
+
+    //     // Render the text
+    //     ImVec2 mousePos = ImGui::GetMousePos();
+    //     ImVec2 windowPos = m_viewportPos;
+    //     ImVec2 relativeMousePos = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
+
+    //     const auto& grid = m_maze.getGrid();
+    //     auto rows = grid.size();
+    //     auto cells = grid[0].size();
+
+    //     // Calculate quad size based on window dimensions
+    //     float quadWidth = 2.0f / rows;
+    //     float quadHeight = 2.0f / cells;
+
+    //     float xPos = -1.0f + std::round(relativeMousePos.x) * quadWidth + quadWidth / 2.0f;
+    //     float yPos = -1.0f + std::round(relativeMousePos.y) * quadHeight + quadHeight / 2.0f;
+
+    //     ImGui::Text("%1f x %2f", xPos, yPos);
+    // }
 
     ImGui::End();
 }
@@ -149,15 +238,43 @@ void MazeVisualizerApp::onDestroy()
 void MazeVisualizerApp::onRandomize()
 {
     m_maze.generate(time(nullptr));
-    onFind();
+    m_iteration.clear();
 }
 
 void MazeVisualizerApp::onFind()
 {
-    m_path = m_finder.findPath(m_start, m_end);
+    auto [path, iterData] = m_finder.findPath(m_start, m_end);
+    m_path = path;
+    m_iteration = iterData;
+    m_iterIndex = 0;
 }
 
 void MazeVisualizerApp::onClear()
 {
     m_path.clear();
+}
+
+void MazeVisualizerApp::onPlay()
+{
+    m_isPlaying = true;
+}
+
+void MazeVisualizerApp::onPause()
+{
+    m_isPlaying = false;
+}
+
+void MazeVisualizerApp::onNext()
+{
+    if (m_iterIndex >= (m_iteration.size() - 1))
+        return;
+    m_iterIndex++;
+}
+
+void MazeVisualizerApp::onPrev()
+{
+    if (m_iterIndex == 0)
+        return;
+
+    m_iterIndex--;
 }

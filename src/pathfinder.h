@@ -3,7 +3,6 @@
 
 #include "maze.h"
 
-#include <algorithm>
 #include <unordered_map>
 
 struct Point
@@ -24,12 +23,20 @@ struct PointHash
     }
 };
 
+struct IterationData
+{
+    Point currentPoint;
+    std::vector<Point> path;
+    std::unordered_map<Point, int, PointHash> neighbors;
+};
+
 class PathFinder
 {
 public:
     PathFinder(const Maze& m);
 
-    std::vector<Point> findPath(Point start, Point end);
+    std::pair<std::vector<Point>,
+              std::vector<IterationData>> findPath(Point start, Point end);
     void printPath(const std::vector<Point>& path) const;
     const Maze& getMaze() const;
 

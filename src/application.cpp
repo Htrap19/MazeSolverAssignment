@@ -236,6 +236,8 @@ void Application::rendererDockspace()
     auto windowSize = ImGui::GetContentRegionAvail();
     ImGui::Image((ImTextureID)(uintptr_t)m_fboTexture,
                  ImVec2(windowSize.x, windowSize.y));
+    m_isViewportFocused = ImGui::IsWindowFocused();
+    m_viewportPos = ImGui::GetWindowPos();
     ImGui::End();
 
     onImGuiUpdate();

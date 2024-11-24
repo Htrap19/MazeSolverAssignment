@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include <imgui.h>
+
 struct GLFWwindow;
 class Application
 {
@@ -36,6 +38,10 @@ public:
 private:
     void onResize(uint32_t width,
                   uint32_t height);
+
+protected:
+    bool m_isViewportFocused = false;
+    ImVec2 m_viewportPos;
 
 private:
     GLFWwindow* m_window = nullptr;

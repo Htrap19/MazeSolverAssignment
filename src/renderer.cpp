@@ -30,8 +30,6 @@ static RenderData s_data;
 
 Renderer::Renderer()
 {
-    m_width = Application::getInstance()->getWindowWidth();
-    m_height = Application::getInstance()->getWindowHeight();
 }
 
 Renderer::~Renderer()
@@ -59,6 +57,9 @@ void Renderer::init()
     glGenBuffers(1, &m_ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * 2048, nullptr, GL_DYNAMIC_DRAW);
+
+    m_width = Application::getInstance()->getWindowWidth();
+    m_height = Application::getInstance()->getWindowHeight();
 }
 
 void Renderer::drawQuad(const glm::vec3& position,
@@ -159,6 +160,39 @@ void Renderer::drawPath(const std::vector<Point> &path,
         drawQuad(glm::vec3(xPos, yPos, 0.0f),
                  glm::vec3(quadWidth * 0.2f, quadHeight * 0.2f, 1.0f),
                  glm::vec3(1.0f, 1.0f, 1.0f));
+    }
+}
+
+void Renderer::visPath(const Maze& maze,
+                       const std::vector<Point>& path,
+                       const std::unordered_set<Point,
+                                                PointHash>& openSet)
+{
+    const auto& grid = maze.getGrid();
+    auto rows = grid.size();
+    auto cells = grid[0].size();
+
+    // Calculate quad size based on window dimensions
+    float quadWidth = 2.0f / rows;
+    float quadHeight = 2.0f / cells;
+    for (auto& p : path)
+    {
+        float x1 = (float)p.x / maze.getWidth() * 2.0f - 1.0f;
+        float y1 = (float)p.y / maze.getHeight() * 2.0f - 1.0f;
+
+        drawQuad(glm::vec3(x1, y1, 0.0),
+                 glm::vec3(quadWidth, quadHeight, 0.0f),
+                 glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    for (const auto& p : openSet)
+    {
+        float x1 = (float)p.x / maze.getWidth() * 2.0f - 1.0f;
+        float y1 = (float)p.y / maze.getHeight() * 2.0f - 1.0f;
+
+        drawQuad(glm::vec3(x1, y1, 0.0),
+                 glm::vec3(quadWidth, quadHeight, 0.0f),
+                 glm::vec3(0.0f, 1.0f, 0.0f));
     }
 }
 

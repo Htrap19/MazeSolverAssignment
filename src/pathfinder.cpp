@@ -1,14 +1,23 @@
 #include "pathfinder.h"
+#include "renderer.h"
+
+#include <GLFW/glfw3.h>
 
 #include <queue>
 #include <iostream>
+#include <algorithm>
+#include <thread>
+#include <chrono>
+
+static Renderer s_renderer;
 
 PathFinder::PathFinder(const Maze& maze)
     : m_maze(maze)
 {}
 
-std::vector<Point> PathFinder::findPath(Point start,
-                                        Point end)
+std::pair<std::vector<Point>, std::vector<IterationData>>
+PathFinder::findPath(Point start,
+                     Point end)
 {
     auto comp = [](const std::pair<int, Point>& a,
                    const std::pair<int, Point>& b)
@@ -26,14 +35,20 @@ std::vector<Point> PathFinder::findPath(Point start,
     openSet.push({0, start});
     gScore[start] = 0;
 
+    std::vector<IterationData> iterData;
+
     while (!openSet.empty())
     {
+        IterationData it;
+
         Point current = openSet.top().second;
         openSet.pop();
+        it.currentPoint = current;
 
         if (current == end)
         {
-            return reconstructPath(cameFrom, current);
+            return std::make_pair(reconstructPath(cameFrom, current),
+                                  iterData);
         }
 
         for (const Point& n : getNeighbors(current))
@@ -47,11 +62,17 @@ std::vector<Point> PathFinder::findPath(Point start,
                 gScore[n] = tentativeGScore;
                 int fScore = tentativeGScore + calculateHeuristic(n, end);
                 openSet.push({fScore, n});
+                it.neighbors[n] = fScore;
             }
         }
+
+        it.path = reconstructPath(cameFrom, current);
+
+        iterData.push_back(it);
     }
 
-    return std::vector<Point>();
+    return std::make_pair(std::vector<Point>(),
+                          std::vector<IterationData>());
 }
 
 void PathFinder::printPath(const std::vector<Point> &path) const
