@@ -9,6 +9,7 @@
 #include "astarpathfinder.h"
 
 #include <imgui.h>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <sstream>
@@ -181,10 +182,11 @@ void MazeVisualizerApp::onImGuiUpdate()
 
     ImGui::Begin("Path Finder");
     static const char* pathFinderAlgos[] =
-        {   "Breadth-First Search (BFS)",
-            "Depth-First Search (DFS)",
-            "A*"
-        };
+    {
+        "Breadth-First Search (BFS)",
+        "Depth-First Search (DFS)",
+        "A*"
+    };
     static int currentPathFinderAlgo = 2;
     if (ImGui::Combo("Algo", &currentPathFinderAlgo, pathFinderAlgos, IM_ARRAYSIZE(pathFinderAlgos)))
     {
@@ -317,4 +319,24 @@ void MazeVisualizerApp::onPrev()
         return;
 
     m_iterIndex--;
+}
+
+void MazeVisualizerApp::onKeyInput(int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_SPACE &&
+        action == GLFW_PRESS)
+    {
+        onRandomize();
+    }
+    else if (key == GLFW_KEY_P &&
+             action == GLFW_PRESS)
+    {
+        onFind();
+    }
+    else if (key == GLFW_KEY_R &&
+             action == GLFW_PRESS)
+    {
+        m_path.clear();
+        m_iteration.clear();
+    }
 }

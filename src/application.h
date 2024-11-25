@@ -35,9 +35,13 @@ public:
 
     static Application* getInstance();
 
-private:
-    void onResize(uint32_t width,
-                  uint32_t height);
+protected:
+    virtual void onResize(uint32_t width,
+                          uint32_t height);
+    virtual void onKeyInput(int key,
+                            int scancode,
+                            int action,
+                            int mods);
 
 protected:
     bool m_isViewportFocused = false;
@@ -52,6 +56,11 @@ private:
     friend void framebufferSizeCallback(GLFWwindow* window,
                                         int width,
                                         int height);
+    friend void keyCallback(GLFWwindow* window,
+                            int key,
+                            int scancode,
+                            int action,
+                            int mods);
 };
 
 #endif // APPLICATION_H

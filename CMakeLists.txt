@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(GLEW REQUIRED)
 
 add_subdirectory(vendor)
 
@@ -16,7 +15,6 @@ include_directories(
     ${OPENGL_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
-    include
     "${CMAKE_CURRENT_SOURCE_DIR}/src/glad/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui"
 )
@@ -42,8 +40,7 @@ add_executable(maze_solver_visualization
 target_link_libraries(maze_solver_visualization
     imgui
     ${OPENGL_LIBRARIES}
-    glfw
-    GLEW::GLEW)
+    glfw)
 
 include(GNUInstallDirs)
 install(TARGETS maze_solver_visualization

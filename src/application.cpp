@@ -13,14 +13,14 @@ static void erroCallback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-static void keyCallback(GLFWwindow* window,
-                        int key,
-                        int scancode,
-                        int action,
-                        int mods)
+void keyCallback(GLFWwindow* window,
+                 int key,
+                 int scancode,
+                 int action,
+                 int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    auto app = (Application*)glfwGetWindowUserPointer(window);
+    app->onKeyInput(key, scancode, action, mods);
 }
 
 void framebufferSizeCallback(GLFWwindow* window,
@@ -292,4 +292,11 @@ void Application::onResize(uint32_t width, uint32_t height)
 
     glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+}
+
+void Application::onKeyInput(int key,
+                             int scancode,
+                             int action,
+                             int mods)
+{
 }

@@ -27,6 +27,11 @@ protected:
     void onNext();
     void onPrev();
 
+    virtual void onKeyInput(int key,
+                            int scancode,
+                            int action,
+                            int mods) override;
+
 private:
     Renderer m_renderer;
     std::shared_ptr<Maze> m_maze; // Selected maze
@@ -39,7 +44,7 @@ private:
     bool m_isPlaying = false;
     uint32_t m_iterIndex = 0;
     std::vector<IterationData> m_iteration;
-    bool m_showFinalPath = false;
+    bool m_showFinalPath = true;
     bool m_visualize = false;
 
     std::array<std::shared_ptr<Maze>, 3> m_mazes;
