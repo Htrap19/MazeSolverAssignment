@@ -42,7 +42,7 @@ This is an Maze Solver Visualization application developed in C++ using OpenGL 4
 - **GLM**: v0.9.9.8
 
 ### Release Information
-- **Current Release Version**: v1.0.0
+- **Current Release Version**: [v1.0.0](https://github.com/Htrap19/MazeSolverAssignment/releases/tag/v1.0.0)
 - **Supported Platform**: x64 Linux
 
 ### Build Dependencies
