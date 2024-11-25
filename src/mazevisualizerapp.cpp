@@ -2,6 +2,7 @@
 
 #include "recursivebacktrackingmaze.h"
 #include "kruskalmaze.h"
+#include "primmaze.h"
 
 #include <imgui.h>
 
@@ -15,6 +16,7 @@ MazeVisualizerApp::MazeVisualizerApp()
 
     m_mazes[0] = std::make_shared<RecursiveBacktrackingMaze>(51, 51);
     m_mazes[1] = std::make_shared<KruskalMaze>(51, 51);
+    m_mazes[2] = std::make_shared<PrimMaze>(51, 51);
 
     m_maze = m_mazes[0];
     m_finder.setMaze(m_maze);
@@ -113,6 +115,7 @@ void MazeVisualizerApp::onImGuiUpdate()
         m_maze->setSize(prevSelectedMaze->getWidth(),
                         prevSelectedMaze->getHeight());
         m_finder.setMaze(m_maze);
+        onClear();
     }
 
     static const char* mazeSizes[] =

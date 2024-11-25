@@ -33,6 +33,7 @@ add_executable(maze_solver_visualization
     src/mazevisualizerapp.h src/mazevisualizerapp.cpp
     src/recursivebacktrackingmaze.h src/recursivebacktrackingmaze.cpp
     src/kruskalmaze.h src/kruskalmaze.cpp
+    src/primmaze.h src/primmaze.cpp
 )
 
 target_link_libraries(maze_solver_visualization
