@@ -1,22 +1,29 @@
 #include "mazevisualizerapp.h"
 
+#include "recursivebacktrackingmaze.h"
+#include "kruskalmaze.h"
+
 #include <imgui.h>
 
 #include <iostream>
 #include <sstream>
 
 MazeVisualizerApp::MazeVisualizerApp()
-    : m_maze(51, 51),
-    m_finder(m_maze)
 {
     m_startPointColor = glm::vec3(0.7f, 0.5f, 0.3f);
     m_endPointColor = glm::vec3(0.5f, 0.3f, 0.5f);
+
+    m_mazes[0] = std::make_shared<RecursiveBacktrackingMaze>(51, 51);
+    m_mazes[1] = std::make_shared<KruskalMaze>(51, 51);
+
+    m_maze = m_mazes[0];
+    m_finder.setMaze(m_maze);
 }
 
 void MazeVisualizerApp::onCreate()
 {
     m_renderer.init();
-    m_maze.generate(time(nullptr));
+    m_maze->generate(time(nullptr));
 
     m_start = {0, 0};
     m_end = {50, 50};
@@ -25,11 +32,11 @@ void MazeVisualizerApp::onCreate()
 
 void MazeVisualizerApp::onUpdate()
 {
-    m_renderer.drawMaze(m_maze);
+    m_renderer.drawMaze(*m_maze);
     if (m_showFinalPath)
         m_renderer.drawPath(m_path, m_finder);
 
-    const auto& grid = m_maze.getGrid();
+    const auto& grid = m_maze->getGrid();
     auto rows = grid.size();
     auto cells = grid[0].size();
 
@@ -101,6 +108,11 @@ void MazeVisualizerApp::onImGuiUpdate()
     if (ImGui::Combo("Algo", &currentAlgo, mazeAlgos, IM_ARRAYSIZE(mazeAlgos)))
     {
         std::cout << "Selected: " << mazeAlgos[currentAlgo] << std::endl;
+        auto prevSelectedMaze = m_maze;
+        m_maze = m_mazes[currentAlgo];
+        m_maze->setSize(prevSelectedMaze->getWidth(),
+                        prevSelectedMaze->getHeight());
+        m_finder.setMaze(m_maze);
     }
 
     static const char* mazeSizes[] =
@@ -131,22 +143,22 @@ void MazeVisualizerApp::onImGuiUpdate()
             uint32_t mazeWidth = std::stoi(widthXheight[0]);
             uint32_t mazeHeight = std::stoi(widthXheight[1]);
 
-            m_maze.setSize(mazeWidth, mazeHeight);
+            m_maze->setSize(mazeWidth, mazeHeight);
         }
     }
 
     if (currentSize == 5)
     {
-        static int width = m_maze.getWidth();
-        static int height = m_maze.getHeight();
+        static int width = m_maze->getWidth();
+        static int height = m_maze->getHeight();
         if (ImGui::InputInt("Width", &width))
         {
-            m_maze.setSize(width, height);
+            m_maze->setSize(width, height);
         }
 
         if (ImGui::InputInt("Height", &height))
         {
-            m_maze.setSize(width, height);
+            m_maze->setSize(width, height);
         }
     }
 
@@ -237,7 +249,8 @@ void MazeVisualizerApp::onDestroy()
 
 void MazeVisualizerApp::onRandomize()
 {
-    m_maze.generate(time(nullptr));
+    m_maze->generate(time(nullptr));
+    m_path.clear();
     m_iteration.clear();
 }
 
@@ -268,6 +281,7 @@ void MazeVisualizerApp::onNext()
 {
     if (m_iterIndex >= (m_iteration.size() - 1))
         return;
+
     m_iterIndex++;
 }
 

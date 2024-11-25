@@ -5,6 +5,8 @@
 #include "renderer.h"
 #include "maze.h"
 
+#include <memory>
+
 class MazeVisualizerApp : public Application
 {
 public:
@@ -27,7 +29,7 @@ protected:
 
 private:
     Renderer m_renderer;
-    Maze m_maze;
+    std::shared_ptr<Maze> m_maze; // Selected maze
     PathFinder m_finder;
     std::vector<Point> m_path;
     Point m_start, m_end;
@@ -39,6 +41,8 @@ private:
     std::vector<IterationData> m_iteration;
     bool m_showFinalPath = false;
     bool m_iterate = false;
+
+    std::array<std::shared_ptr<Maze>, 3> m_mazes;
 };
 
 #endif // MAZEVISUALIZERAPP_H

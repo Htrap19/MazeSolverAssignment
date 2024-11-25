@@ -31,6 +31,8 @@ add_executable(maze_solver_visualization
     src/pathfinder.h src/pathfinder.cpp
     src/application.h src/application.cpp
     src/mazevisualizerapp.h src/mazevisualizerapp.cpp
+    src/recursivebacktrackingmaze.h src/recursivebacktrackingmaze.cpp
+    src/kruskalmaze.h src/kruskalmaze.cpp
 )
 
 target_link_libraries(maze_solver_visualization

@@ -142,7 +142,7 @@ void Renderer::drawMaze(const Maze &maze)
 void Renderer::drawPath(const std::vector<Point> &path,
                         const PathFinder& finder)
 {
-    const auto& grid = finder.getMaze().getGrid();
+    const auto& grid = finder.getMaze()->getGrid();
     auto rows = grid.size();
     auto cells = grid[0].size();
 

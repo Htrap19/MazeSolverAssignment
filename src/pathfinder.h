@@ -4,6 +4,7 @@
 #include "maze.h"
 
 #include <unordered_map>
+#include <memory>
 
 struct Point
 {
@@ -33,12 +34,14 @@ struct IterationData
 class PathFinder
 {
 public:
-    PathFinder(const Maze& m);
+    PathFinder() = default;
+    PathFinder(const std::shared_ptr<Maze>& maze);
 
     std::pair<std::vector<Point>,
               std::vector<IterationData>> findPath(Point start, Point end);
     void printPath(const std::vector<Point>& path) const;
-    const Maze& getMaze() const;
+    void setMaze(const std::shared_ptr<Maze>& maze);
+    const std::shared_ptr<Maze>& getMaze() const;
 
 private:
     int calculateHeuristic(const Point& a, const Point& b) const;
@@ -48,7 +51,7 @@ private:
         Point current);
 
 private:
-    const Maze& m_maze;
+    std::shared_ptr<Maze> m_maze;
 };
 
 #endif // PATHFINDER_H

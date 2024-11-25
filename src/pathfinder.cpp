@@ -11,7 +11,7 @@
 
 static Renderer s_renderer;
 
-PathFinder::PathFinder(const Maze& maze)
+PathFinder::PathFinder(const std::shared_ptr<Maze>& maze)
     : m_maze(maze)
 {}
 
@@ -77,9 +77,9 @@ PathFinder::findPath(Point start,
 
 void PathFinder::printPath(const std::vector<Point> &path) const
 {
-    auto height = m_maze.getHeight();
-    auto width = m_maze.getWidth();
-    const auto& grid = m_maze.getGrid();
+    auto height = m_maze->getHeight();
+    auto width = m_maze->getWidth();
+    const auto& grid = m_maze->getGrid();
     std::vector<std::vector<char>> display(height, std::vector<char>(width, ' '));
 
     // Fill with maze
@@ -109,7 +109,12 @@ void PathFinder::printPath(const std::vector<Point> &path) const
 
 }
 
-const Maze& PathFinder::getMaze() const
+void PathFinder::setMaze(const std::shared_ptr<Maze> &maze)
+{
+    m_maze = maze;
+}
+
+const std::shared_ptr<Maze>& PathFinder::getMaze() const
 {
     return m_maze;
 }
@@ -129,8 +134,8 @@ std::vector<Point> PathFinder::getNeighbors(const Point &p) const
         auto nx = p.x + Maze::dx[i];
         auto ny = p.y + Maze::dy[i];
 
-        if (m_maze.isValidCell(nx, ny) &&
-            !m_maze.isWall(nx, ny))
+        if (m_maze->isValidCell(nx, ny) &&
+            !m_maze->isWall(nx, ny))
         {
             neighbors.push_back(Point{nx, ny});
         }

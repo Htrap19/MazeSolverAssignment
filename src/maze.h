@@ -15,8 +15,9 @@ public:
 public:
     Maze(uint32_t width = 21,
          uint32_t height = 21);
+    virtual ~Maze() = default;
 
-    void generate(uint32_t seed = 0);
+    virtual void generate(uint32_t seed = 0);
     void clear();
     bool isValidCell(int cx, int cy) const;
     bool isWall(int cx, int cy) const;
@@ -26,14 +27,11 @@ public:
 
     const std::vector<std::vector<int>>& getGrid() const;
 
-    void print() const;
+    virtual void print() const;
     uint32_t getHeight() const;
     uint32_t getWidth() const;
 
-private:
-    void recursiveBacktracking(int cx, int cy);
-
-private:
+protected:
     std::vector<std::vector<int>> m_grid;
     uint32_t m_width, m_height;
     std::mt19937 m_rng;
