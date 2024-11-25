@@ -30,7 +30,7 @@ protected:
 private:
     Renderer m_renderer;
     std::shared_ptr<Maze> m_maze; // Selected maze
-    PathFinder m_finder;
+    std::shared_ptr<PathFinder> m_finder;
     std::vector<Point> m_path;
     Point m_start, m_end;
     glm::vec3 m_startPointColor, m_endPointColor;
@@ -40,9 +40,10 @@ private:
     uint32_t m_iterIndex = 0;
     std::vector<IterationData> m_iteration;
     bool m_showFinalPath = false;
-    bool m_iterate = false;
+    bool m_visualize = false;
 
     std::array<std::shared_ptr<Maze>, 3> m_mazes;
+    std::array<std::shared_ptr<PathFinder>, 3> m_pathFinders;
 };
 
 #endif // MAZEVISUALIZERAPP_H

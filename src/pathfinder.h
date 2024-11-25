@@ -14,6 +14,11 @@ struct Point
     {
         return x == other.x && y == other.y;
     }
+
+    bool operator!=(const Point& other) const
+    {
+        return x != other.x || y != other.y;
+    }
 };
 
 struct PointHash
@@ -36,15 +41,16 @@ class PathFinder
 public:
     PathFinder() = default;
     PathFinder(const std::shared_ptr<Maze>& maze);
+    virtual ~PathFinder() = default;
 
-    std::pair<std::vector<Point>,
-              std::vector<IterationData>> findPath(Point start, Point end);
+    virtual std::pair<std::vector<Point>,
+                      std::vector<IterationData>>
+    findPath(Point start, Point end) = 0;
     void printPath(const std::vector<Point>& path) const;
     void setMaze(const std::shared_ptr<Maze>& maze);
     const std::shared_ptr<Maze>& getMaze() const;
 
-private:
-    int calculateHeuristic(const Point& a, const Point& b) const;
+protected:
     std::vector<Point> getNeighbors(const Point& p) const;
     std::vector<Point> reconstructPath(
         std::unordered_map<Point, Point, PointHash>& cameFrom,

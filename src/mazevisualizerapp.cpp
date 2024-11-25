@@ -4,6 +4,9 @@
 #include "kruskalmaze.h"
 #include "primmaze.h"
 
+#include "astarpathfinder.h"
+#include "bfspathfinder.h"
+
 #include <imgui.h>
 
 #include <iostream>
@@ -18,8 +21,12 @@ MazeVisualizerApp::MazeVisualizerApp()
     m_mazes[1] = std::make_shared<KruskalMaze>(51, 51);
     m_mazes[2] = std::make_shared<PrimMaze>(51, 51);
 
+    m_pathFinders[0] = std::make_shared<BFSPathFinder>();
+    m_pathFinders[2] = std::make_shared<AStarPathFinder>();
+    m_finder = m_pathFinders[0];
+
     m_maze = m_mazes[0];
-    m_finder.setMaze(m_maze);
+    m_finder->setMaze(m_maze);
 }
 
 void MazeVisualizerApp::onCreate()
@@ -36,7 +43,7 @@ void MazeVisualizerApp::onUpdate()
 {
     m_renderer.drawMaze(*m_maze);
     if (m_showFinalPath)
-        m_renderer.drawPath(m_path, m_finder);
+        m_renderer.drawPath(m_path, *m_finder);
 
     const auto& grid = m_maze->getGrid();
     auto rows = grid.size();
@@ -57,7 +64,7 @@ void MazeVisualizerApp::onUpdate()
                             color);
     }
 
-    if (!m_iteration.empty() && m_iterate)
+    if (!m_iteration.empty() && m_visualize)
     {
         auto& iterData = m_iteration[m_iterIndex];
         auto point = iterData.currentPoint;
@@ -68,7 +75,7 @@ void MazeVisualizerApp::onUpdate()
                             {quadWidth, quadHeight, 0.0f},
                             glm::vec3(0.5f, 0.2f, 0.3f));
 
-        m_renderer.drawPath(iterData.path, m_finder);
+        m_renderer.drawPath(iterData.path, *m_finder);
 
         for (auto& [n, fScore] : iterData.neighbors)
         {
@@ -85,7 +92,7 @@ void MazeVisualizerApp::onUpdate()
 
     m_renderer.flush();
 
-    if (m_isPlaying && m_iterate)
+    if (m_isPlaying && m_visualize)
     {
         static uint32_t playTimeout = 0;
         playTimeout++;
@@ -114,7 +121,7 @@ void MazeVisualizerApp::onImGuiUpdate()
         m_maze = m_mazes[currentAlgo];
         m_maze->setSize(prevSelectedMaze->getWidth(),
                         prevSelectedMaze->getHeight());
-        m_finder.setMaze(m_maze);
+        m_finder->setMaze(m_maze);
         onClear();
     }
 
@@ -180,6 +187,10 @@ void MazeVisualizerApp::onImGuiUpdate()
     if (ImGui::Combo("Algo", &currentPathFinderAlgo, pathFinderAlgos, IM_ARRAYSIZE(pathFinderAlgos)))
     {
         std::cout << "Selected: " << pathFinderAlgos[currentPathFinderAlgo] << std::endl;
+        m_finder = m_pathFinders[currentPathFinderAlgo];
+        m_finder->setMaze(m_maze);
+        m_path.clear();
+        m_iteration.clear();
     }
     ImGui::InputInt2("Start Pos", &m_start.x);
     ImGui::SameLine();
@@ -198,21 +209,31 @@ void MazeVisualizerApp::onImGuiUpdate()
     ImGui::SameLine();
     ImGui::Checkbox("Show final path", &m_showFinalPath);
 
-    ImGui::SeparatorText("Iteration");
-    ImGui::Checkbox("Iterate", &m_iterate);
-    if (ImGui::Button("< Prev"))
-        onPrev();
-    ImGui::SameLine();
-    if (ImGui::Button(m_isPlaying ? "Pause" : "Play"))
+    if (!m_iteration.empty())
     {
-        if (m_isPlaying)
-            onPause();
-        else
-            onPlay();
+        ImGui::SeparatorText("Visualization");
+        ImGui::Checkbox("Visualize", &m_visualize);
+        uint32_t minValue = 0;
+        uint32_t maxValue = (m_iteration.size() - 1);
+        ImGui::SliderScalar("##hidden",
+                            ImGuiDataType_U32,
+                            &m_iterIndex,
+                            (const void*)&minValue,
+                            (const void*)&maxValue);
+        if (ImGui::Button("< Prev"))
+            onPrev();
+        ImGui::SameLine();
+        if (ImGui::Button(m_isPlaying ? "Pause" : "Play"))
+        {
+            if (m_isPlaying)
+                onPause();
+            else
+                onPlay();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Next >"))
+            onNext();
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Next >"))
-        onNext();
 
     // Calculate the position of from grid based on the mouse pos
     // if (m_isViewportFocused)
@@ -259,7 +280,7 @@ void MazeVisualizerApp::onRandomize()
 
 void MazeVisualizerApp::onFind()
 {
-    auto [path, iterData] = m_finder.findPath(m_start, m_end);
+    auto [path, iterData] = m_finder->findPath(m_start, m_end);
     m_path = path;
     m_iteration = iterData;
     m_iterIndex = 0;
