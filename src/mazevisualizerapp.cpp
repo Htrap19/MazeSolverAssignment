@@ -4,8 +4,9 @@
 #include "kruskalmaze.h"
 #include "primmaze.h"
 
-#include "astarpathfinder.h"
 #include "bfspathfinder.h"
+#include "dfspathfinder.h"
+#include "astarpathfinder.h"
 
 #include <imgui.h>
 
@@ -22,6 +23,7 @@ MazeVisualizerApp::MazeVisualizerApp()
     m_mazes[2] = std::make_shared<PrimMaze>(51, 51);
 
     m_pathFinders[0] = std::make_shared<BFSPathFinder>();
+    m_pathFinders[1] = std::make_shared<DFSPathFinder>();
     m_pathFinders[2] = std::make_shared<AStarPathFinder>();
     m_finder = m_pathFinders[0];
 

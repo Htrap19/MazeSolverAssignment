@@ -36,6 +36,7 @@ add_executable(maze_solver_visualization
     src/primmaze.h src/primmaze.cpp
     src/astarpathfinder.h src/astarpathfinder.cpp
     src/bfspathfinder.h src/bfspathfinder.cpp
+    src/dfspathfinder.h src/dfspathfinder.cpp
 )
 
 target_link_libraries(maze_solver_visualization
